@@ -1,0 +1,101 @@
+var video = document.getElementById("rick")
+var startTime = 1570815649091
+
+video.addEventListener('loadedmetadata', function() {
+  video.play()
+
+  jumpToLocation()
+
+  video.addEventListener('play', function() {
+    console.log("Playing.")
+
+    window.setTimeout(sync, 2000)
+  })
+})
+
+function jumpToLocation() {
+  var difference = Date.now() - startTime
+  var currentTime = (difference / 1000) % video.duration
+
+  video.currentTime = currentTime
+}
+
+function restorePlaybackRate() {
+  console.log("Restoring normal speed and waiting 10 seconds.")
+
+  video.playbackRate = 1.0
+
+  window.setTimeout(sync, 10000)
+}
+
+function sync() {
+  console.log("Syncing.")
+
+  var difference = Date.now() - startTime
+  var currentTime = (difference / 1000) % video.duration
+
+  console.log("Video should be " + currentTime)
+  console.log("Video is " + video.currentTime)
+
+  var offset = currentTime - video.currentTime
+
+  console.log("Offset is " + offset)
+
+
+  if (offset > 1) {
+    console.log("Offset too big. Jumping.")
+
+    jumpToLocation()
+
+    window.setTimeout(sync, 2000)
+  }
+  else if (offset > 0.1) {
+    console.log("Speeding up a lot.")
+
+    video.playbackRate = 1.1
+
+    var delay = Math.round(offset * 10 * 1000)
+
+    console.log("Waiting " + (delay / 1000))
+
+    window.setTimeout(restorePlaybackRate, delay)
+  }
+  else if (offset < -0.1) {
+    console.log("Slowing down a lot.")
+
+    video.playbackRate = 0.9
+
+    var delay = Math.round(offset * -10 * 1000)
+
+    console.log("Waiting " + (delay / 1000))
+
+    window.setTimeout(restorePlaybackRate, delay)
+  }
+  else if (offset > 0.01) {
+    console.log("Speeding up a little bit.")
+
+    video.playbackRate = 1.01
+
+    var delay = Math.round(offset * 100 * 1000)
+
+    console.log("Waiting " + (delay / 1000))
+
+    window.setTimeout(restorePlaybackRate, delay)
+  }
+  else if (offset < -0.01) {
+    console.log("Slowing down a little bit.")
+
+    video.playbackRate = 0.99
+
+    var delay = Math.round(offset * -100 * 1000)
+
+    console.log("Waiting " + (delay / 1000))
+
+    window.setTimeout(restorePlaybackRate, delay)
+  }
+  else {
+    console.log("Timing good. Waiting 10 seconds.")
+
+    window.setTimeout(sync, 10000)
+  }
+}
